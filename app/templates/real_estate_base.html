@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+
+{% block content %}
+<form mothod="GET">
+	<div>
+		Застройщик:<br>
+		<select id='developer' onchange="developSelectChangeValue()">
+				<option value="0">Все застройщики</option>
+				{% set cur_developer_id = request.args.get('dev')|int %}
+				{% for developer in developer %}
+				<option value={{ developer.id }} {% if developer.id == cur_developer_id %} selected {% endif %}>
+					{{ developer.id }}:{{ developer.name }}
+				</option>
+				{% endfor %}
+			</select>
+		</div>
+		<br>
+		<div>
+			ЖК:<br>
+			<select id='housing_complex' onchange="housingComplexSelectChangeValue()">
+				<option value="0">Все ЖК</option>
+				{% set cur_housing_complex_id = request.args.get('hc')|int %}
+				{% for housing_complex in housing_complex %}
+				<option value={{ housing_complex.id }} {% if housing_complex.id == cur_housing_complex_id %} selected {% endif %}>
+					{{ housing_complex.id }}: {{ housing_complex.name }}
+				</option>
+				{% endfor %}
+			</select>
+		</div>
+		<br>
+		<div>
+			Корпус:<br>
+			<select id='house' onchange="houseSelectChangeValue()">
+				<option value="0">Все корпуса</option>
+				{% set cur_house_id = request.args.get('h')|int %}
+				{% for house in house %}
+				<option value={{ house.id }} {% if house.id == cur_house_id %} selected {% endif %}>
+					{{ house.id }}: {{ house.name }}
+				</option>
+				{% endfor %}
+			</select>
+		</div>
+</form>
+		<br>
+		<div>
+	Объекты:<br>
+	<table>
+		<tr>
+			<th>id объекта</th>
+			<th>id застройщика</th>
+			<th>кол-во комнат</th>
+			<th>площадь</th>
+			<th>цена</th>
+			<th>цена метра</th>
+			<th>этаж</th>
+			<th>номер на этаже</th>
+			<th>номер в доме</th>
+			<th>студия</th>
+			<th>тип помещения</th>
+			<th>отделка</th>
+			<th>цена со скидкой</th>
+			<th>источник</th>
+		</tr>
+		{% for object in object %}
+		<tr>
+			<td>{{ object.id}}</td>
+			<td>{{ object.developer_id}}</td>
+			<td>{{ object.room}}</td>
+			<td>{{ object.square}}</td>
+			<td>{{ object.price}}</td>
+			<td>{{ object.price_meter}}</td>
+			<td>{{ object.floor}}</td>
+			<td>{{ object.floor_number}}</td>
+			<td>{{ object.house_number}}</td>
+			<td>{{ object.section_number}}</td>
+			<td>{{ object.type_studio}}</td>
+			<td>{{ object.type}}</td>
+			<td>{{ object.decoration}}</td>
+			<td>{{ object.price_discount}}</td>
+			<td>{{ object.source}}</td>
+		</tr>
+		{% endfor %}
+	</table>
+</div>
+{% endblock %}
+
