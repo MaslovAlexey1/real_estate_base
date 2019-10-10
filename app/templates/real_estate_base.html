@@ -18,10 +18,12 @@
 		<div>
 			ЖК:<br>
 			<select id='housing_complex' onchange="housingComplexSelectChangeValue()">
-				<option value="0">Все ЖК</option>
+				<option value="0" data-dev={{cur_developer_id}}>Все ЖК</option>
 				{% set cur_housing_complex_id = request.args.get('hc')|int %}
 				{% for housing_complex in housing_complex %}
-				<option value={{ housing_complex.id }} {% if housing_complex.id == cur_housing_complex_id %} selected {% endif %}>
+				<option value={{ housing_complex.id }} {% if housing_complex.id == cur_housing_complex_id %} selected {% endif %}
+						data-dev={{ housing_complex.developer_id }}				
+				>
 					{{ housing_complex.id }}: {{ housing_complex.name }}
 				</option>
 				{% endfor %}
@@ -31,10 +33,13 @@
 		<div>
 			Корпус:<br>
 			<select id='house' onchange="houseSelectChangeValue()">
-				<option value="0">Все корпуса</option>
+				<option value="0" data-dev={{cur_developer_id}} data-hc={{cur_housing_complex_id}}>Все корпуса</option>
 				{% set cur_house_id = request.args.get('h')|int %}
 				{% for house in house %}
-				<option value={{ house.id }} {% if house.id == cur_house_id %} selected {% endif %}>
+				<option value={{ house.id }} {% if house.id == cur_house_id %} selected {% endif %}
+				data-dev={{ house.developer_id }}
+				data-hc={{ house.housing_complex_id }}
+				>
 					{{ house.id }}: {{ house.name }}
 				</option>
 				{% endfor %}

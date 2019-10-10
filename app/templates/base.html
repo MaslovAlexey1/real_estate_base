@@ -56,8 +56,8 @@
 			//var selValue = document.getElementById("singleSelectDD").value;
 			var url = window.location.href
 			// Developer
-			var selObj = document.getElementById("developer");
-			var selValue = selObj.options[selObj.selectedIndex].value;
+			var selObj = document.getElementById("housing_complex");
+			var selValue = selObj.options[selObj.selectedIndex].dataset.dev;
 			url = updateURLParameter(url, 'dev', selValue);
 			// Housing_complex
 			var selObj = document.getElementById("housing_complex");
@@ -77,12 +77,12 @@
 			//var selValue = document.getElementById("singleSelectDD").value;
 			var url = window.location.href
 			// Developer
-			var selObj = document.getElementById("developer");
-			var selValue = selObj.options[selObj.selectedIndex].value;
+			var selObj = document.getElementById("house");
+			var selValue = selObj.options[selObj.selectedIndex].dataset.dev;
 			url = updateURLParameter(url, 'dev', selValue);
 			// Housing_complex
-			var selObj = document.getElementById("housing_complex");
-			var selValue = selObj.options[selObj.selectedIndex].value;
+			var selObj = document.getElementById("house");
+			var selValue = selObj.options[selObj.selectedIndex].dataset.hc;
 			url = updateURLParameter(url, 'hc', selValue);
 			// House
 			var selObj = document.getElementById("house");
