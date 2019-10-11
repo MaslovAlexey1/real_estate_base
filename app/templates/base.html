@@ -1,11 +1,13 @@
 <html>
 
 <head>
+	<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 	{% if title %}
 	<title>{{ title }} - microblog</title>
 	{% else %}
 	<title>microblog</title>
 	{% endif %}
+
 </head>
 
 <body>
@@ -98,7 +100,7 @@
 		Microblog:
 		<a href="{{ url_for('index') }}">Home</a>
 		<a href="{{ url_for('login') }}">Login</a>
-		<a href="{{ url_for('real_estate_base', dev='1') }}">Real Estate Base</a>
+		<a href="{{ url_for('real_estate_base', dev='0', hc='0', h='0') }}">Real Estate Base</a>
 	</div>
 	<hr>
 	{% with messages = get_flashed_messages() %}
