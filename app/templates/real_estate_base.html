@@ -45,10 +45,25 @@
 				{% endfor %}
 			</select>
 		</div>
+		<br>
+		<div>
+			Тип объекта:<br>
+			<select id='object_type' onchange="objectTypeSelectChangeValue()">
+				{% set cur_object_type = request.args.get('ot') %}
+				<!-- {% set object_type = ['Квартира', 'Апартамент', 'Кв/ап', 'Машино-место', 'Кладовка', 'Нежилое']  %} -->
+				{% for object_type in object_type %}
+				<option value={{ object_type }} {% if object_type == cur_object_type %} selected {% endif %}>
+					{{ object_type }}
+				</option>
+				{% endfor %}
+			</select>
+		</div>
 </form>
-	<img src="{{ url_for('fig', dev=cur_developer_id, hc=cur_housing_complex_id, h=cur_house_id) }}"
+	<img src="{{ url_for('square_price_scatter', dev=cur_developer_id, hc=cur_housing_complex_id, h=cur_house_id, ot=cur_object_type) }}"
 		alt="Image Placeholder"
 		height="400">
+	<!-- <img src="{{ url_for('price_boxplot', dev=cur_developer_id, hc=cur_housing_complex_id, h=cur_house_id) }}" -->
+		<!-- alt="Image Placeholder" height="400"> -->
 		<br>
 		<div>
 	Объекты:<br>
@@ -67,7 +82,7 @@
 			<th>тип помещения</th>
 			<th>отделка</th>
 			<th>цена со скидкой</th>
-			<th>источник</th>
+			<!-- <th>источник</th> -->
 		</tr>
 		{% for object in object %}
 		<tr>
@@ -85,7 +100,7 @@
 			<td>{{ object.type}}</td>
 			<td>{{ object.decoration}}</td>
 			<td>{{ object.price_discount}}</td>
-			<td>{{ object.source}}</td>
+			<!-- <td>{{ object.source}}</td> -->
 		</tr>
 		{% endfor %}
 	</table>

@@ -50,33 +50,38 @@ def real_estate_base():
 	house_id = request.args.get('h')
 	house_id = int(house_id) if house_id is not None else 0
 
+	object_type = request.args.get('ot')
+
 	if developer_id == 0:
 		housing_complex = HousingComplex.query.all()
 		house = House.query.filter_by().all()
-		object = Object.query.filter_by().limit(100).all()
+		object = Object.query.filter_by(type=object_type).limit(100).all()
 	elif housing_complex_id == 0:
 		housing_complex = HousingComplex.query.filter_by(developer_id=developer_id).all()
 		house = House.query.filter_by(developer_id=developer_id).all()
-		object = Object.query.filter_by(developer_id=developer_id).limit(100).all()
+		object = Object.query.filter_by(developer_id=developer_id, type=object_type).limit(100).all()
 	elif house_id == 0:
 		housing_complex = HousingComplex.query.filter_by(developer_id=developer_id).all()
 		house = House.query.filter_by(housing_complex_id=housing_complex_id).all()
-		object = Object.query.filter_by(housing_complex_id=housing_complex_id).limit(100).all()
+		object = Object.query.filter_by(housing_complex_id=housing_complex_id, type=object_type).limit(100).all()
 	elif house_id != 0:
 		housing_complex = HousingComplex.query.filter_by(developer_id=developer_id).all()
 		house = House.query.filter_by(housing_complex_id=housing_complex_id).all()
-		object = Object.query.filter_by(house_id=house_id).limit(100).all()
+		object = Object.query.filter_by(house_id=house_id, type=object_type).limit(100).all()
+
+	object_type = Object.query.with_entities(Object.type).distinct()
 
 	return render_template('real_estate_base.html', title='Real Estate Base',
 		developer = developer, 
 		housing_complex = housing_complex, 
 		house = house,
-		object = object
+		object = object,
+		object_type = object_type
 		)
 
-@app.route('/fig')
 
-def fig():
+@app.route('/square_price_scatter')
+def square_price_scatter():
 	developer_id = request.args.get('dev')
 	developer_id = int(developer_id) if developer_id is not None else 0
 
@@ -86,12 +91,57 @@ def fig():
 	house_id = request.args.get('h')
 	house_id = int(house_id) if house_id is not None else 0
 	
+	object_type = request.args.get('ot')
+
+	fig, ax = plt.subplots(figsize=(10, 6))
+
+	conn = 'sqlite:///app.db'
+	if developer_id == 0:
+		df = pd.read_sql('select o.room, o.square, o.price from object o where o.type = "' + str(object_type) + '" order by random() limit 1000', conn)
+	elif housing_complex_id == 0:
+		df = pd.read_sql(
+			'select o.room, o.square, o.price from object o where o.type = "' + str(object_type) + '" and o.developer_id = ' + str(developer_id), conn)
+	elif house_id == 0:
+		df = pd.read_sql(
+			'select o.room, o.square, o.price from object o where o.type = "' + str(object_type) + '"  and o.housing_complex_id = ' + str(housing_complex_id), conn)
+	elif house_id != 0:
+		df = pd.read_sql(
+			'select o.room, o.square, o.price from object o where o.type = "' + str(object_type) + '"  and o.house_id = ' + str(house_id), conn)
+	
+	df['price'] = pd.to_numeric(df['price'])
+	df['square'] = pd.to_numeric(df['square'])
+
+	g = sns.scatterplot(x='square', y='price', data=df)
+	plt.tight_layout()
+
+	formatter = FuncFormatter(millions)
+	g.yaxis.set_major_formatter(formatter)
+
+	img = io.BytesIO()
+	fig.savefig(img)
+	img.seek(0)
+	return send_file(img, mimetype='image/png')
+
+
+@app.route('/price_boxplot')
+def price_boxplot():
+	developer_id = request.args.get('dev')
+	developer_id = int(developer_id) if developer_id is not None else 0
+
+	housing_complex_id = request.args.get('hc')
+	housing_complex_id = int(
+		housing_complex_id) if housing_complex_id is not None else 0
+
+	house_id = request.args.get('h')
+	house_id = int(house_id) if house_id is not None else 0
+
 	fig, ax = plt.subplots(figsize=(10, 6))
 
 	conn = 'sqlite:///app.db'
 	if developer_id == 0:
 		# df = pd.read_sql('select d.id, d.name, min(o.price) min_price, max(o.price) max_price, count(o.id) objects from object o join developer d on o.developer_id=d.id group by d.id', conn)
-		df = pd.read_sql('select o.room, o.square, o.price from object o order by random() limit 5000', conn)
+		df = pd.read_sql(
+			'select o.room, o.square, o.price from object o order by random() limit 5000', conn)
 		df['price'] = pd.to_numeric(df['price'])
 		df['square'] = pd.to_numeric(df['square'])
 
@@ -101,7 +151,8 @@ def fig():
 		formatter = FuncFormatter(millions)
 		g.yaxis.set_major_formatter(formatter)
 	elif housing_complex_id == 0:
-		df = pd.read_sql('select hc.id, hc.name, o.price from object o join housing_complex hc on o.housing_complex_id=hc.id where o.developer_id = ' + str(developer_id), conn)
+		df = pd.read_sql(
+			'select hc.id, hc.name, o.price from object o join housing_complex hc on o.housing_complex_id=hc.id where o.developer_id = ' + str(developer_id), conn)
 		df['price'] = pd.to_numeric(df['price'])
 		g = sns.boxplot(y='price', x='name', data=df)
 		g.set_xticklabels(g.get_xticklabels(), rotation=45,
@@ -126,9 +177,10 @@ def fig():
 		g.set_ylabel('')
 
 		formatter = FuncFormatter(millions)
-		g.yaxis.set_major_formatter(formatter) 
+		g.yaxis.set_major_formatter(formatter)
 	elif house_id != 0:
-		df = pd.read_sql('select * from object where house_id = ' + str(house_id), conn)
+		df = pd.read_sql(
+			'select * from object where house_id = ' + str(house_id), conn)
 
 	# ax.hist(np.random.rand(Ntotal), 20)
 
@@ -137,10 +189,9 @@ def fig():
 	img.seek(0)
 	return send_file(img, mimetype='image/png')
 
-
 def millions(x, pos):
     'The two args are the value and tick position'
-    return '%1.0fM' % (x/1e6)
+    return '%1.1fM' % (x/1e6)
 
 @app.route('/about')
 def about():

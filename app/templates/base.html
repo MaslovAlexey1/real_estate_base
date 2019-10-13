@@ -48,7 +48,10 @@
 			var selObj = document.getElementById("house");
 			var selValue = 0;
 			url = updateURLParameter(url, 'h', selValue);
-
+			// Object type
+			var selObj = document.getElementById("object_type");
+			var selValue = selObj.options[selObj.selectedIndex].value;
+			url = updateURLParameter(url, 'ot', selValue);
 			// Redirect
 			window.location.replace(url);
 		}
@@ -69,7 +72,10 @@
 			var selObj = document.getElementById("house");
 			var selValue = 0;
 			url = updateURLParameter(url, 'h', selValue);
-
+			// Object type
+			var selObj = document.getElementById("object_type");
+			var selValue = selObj.options[selObj.selectedIndex].value;
+			url = updateURLParameter(url, 'ot', selValue);
 			// Redirect
 			window.location.replace(url);
 		}
@@ -90,7 +96,22 @@
 			var selObj = document.getElementById("house");
 			var selValue = selObj.options[selObj.selectedIndex].value;
 			url = updateURLParameter(url, 'h', selValue);
+			// Object type
+			var selObj = document.getElementById("object_type");
+			var selValue = selObj.options[selObj.selectedIndex].value;
+			url = updateURLParameter(url, 'ot', selValue);
+			// Redirect
+			window.location.replace(url);
+		}
 
+		function objectTypeSelectChangeValue() {
+			//Getting Value
+			//var selValue = document.getElementById("singleSelectDD").value;
+			var url = window.location.href
+			// Object type
+			var selObj = document.getElementById("object_type");
+			var selValue = selObj.options[selObj.selectedIndex].value;
+			url = updateURLParameter(url, 'ot', selValue);
 			// Redirect
 			window.location.replace(url);
 		}
@@ -100,7 +121,7 @@
 		Microblog:
 		<a href="{{ url_for('index') }}">Home</a>
 		<a href="{{ url_for('login') }}">Login</a>
-		<a href="{{ url_for('real_estate_base', dev='0', hc='0', h='0') }}">Real Estate Base</a>
+		<a href="{{ url_for('real_estate_base', dev='0', hc='0', h='0', ot='Квартира') }}">Real Estate Base</a>
 	</div>
 	<hr>
 	{% with messages = get_flashed_messages() %}
