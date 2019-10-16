@@ -1,12 +1,31 @@
-{% extends "base.html" %}
+{% extends "layout.html" %}
+
+{% set cur_developer_id = request.args.get('dev')|int %}
+{% set cur_housing_complex_id = request.args.get('hc')|int %}
+{% set cur_house_id = request.args.get('h')|int %}
+{% set cur_object_type = request.args.get('ot') %}
+{% set cur_room = request.args.get('r') %}
+{% set cur_decoration = request.args.get('dec') %}
+{% set cur_price_min = request.args.get('price_min') %}
+{% set cur_price_max = request.args.get('price_max') %}
+{% set cur_square_min = request.args.get('square_min') %}
+{% set cur_square_max = request.args.get('square_max') %}
+{% set cur_is_studio = request.args.get('is_studio') %}
+{% set cur_house_class = request.args.get('hclass') %}
+{% set cur_agreement = request.args.get('agr') %}
+{% set cur_stage = request.args.get('stage') %}
+{% set cur_zone = request.args.get('zone') %}
+{% set cur_region_city = request.args.get('rcity')|int %}
+{% set cur_district_direction = request.args.get('dd')|int %}
+{% set cur_atd = request.args.get('atd')|int %}
+
 
 {% block content %}
-<form mothod="GET">
-	<div>
-		Застройщик:<br>
-		<select id='developer' onchange="developSelectChangeValue()">
+	<form mothod="GET" class="form-inline well">
+		<div>
+			Застройщик:<br>
+			<select class="custom-select" id='developer' onchange="developSelectChangeValue()">
 				<option value="0">Все застройщики</option>
-				{% set cur_developer_id = request.args.get('dev')|int %}
 				{% for developer in developer %}
 				<option value={{ developer.id }} {% if developer.id == cur_developer_id %} selected {% endif %}>
 					{{ developer.id }}:{{ developer.name }}
@@ -14,96 +33,353 @@
 				{% endfor %}
 			</select>
 		</div>
-		<br>
 		<div>
 			ЖК:<br>
-			<select id='housing_complex' onchange="housingComplexSelectChangeValue()">
-				<option value="0" data-dev={{cur_developer_id}}>Все ЖК</option>
-				{% set cur_housing_complex_id = request.args.get('hc')|int %}
+			<select class="custom-select" id='housing_complex' onchange="housingComplexSelectChangeValue()">
+				<option value="0" data-dev={{cur_developer_id}}>все ЖК</option>
 				{% for housing_complex in housing_complex %}
-				<option value={{ housing_complex.id }} {% if housing_complex.id == cur_housing_complex_id %} selected {% endif %}
-						data-dev={{ housing_complex.developer_id }}				
-				>
+				<option value={{ housing_complex.id }} {% if housing_complex.id == cur_housing_complex_id %} selected
+					{% endif %} data-dev={{ housing_complex.developer_id }}>
 					{{ housing_complex.id }}: {{ housing_complex.name }}
 				</option>
 				{% endfor %}
 			</select>
 		</div>
-		<br>
 		<div>
 			Корпус:<br>
-			<select id='house' onchange="houseSelectChangeValue()">
-				<option value="0" data-dev={{cur_developer_id}} data-hc={{cur_housing_complex_id}}>Все корпуса</option>
-				{% set cur_house_id = request.args.get('h')|int %}
+			<select class="custom-select" id='house' onchange="houseSelectChangeValue()">
+				<option value="0" data-dev={{cur_developer_id}} data-hc={{cur_housing_complex_id}}>все корпуса</option>
 				{% for house in house %}
 				<option value={{ house.id }} {% if house.id == cur_house_id %} selected {% endif %}
-				data-dev={{ house.developer_id }}
-				data-hc={{ house.housing_complex_id }}
-				>
+					data-dev={{ house.developer_id }} data-hc={{ house.housing_complex_id }}>
 					{{ house.id }}: {{ house.name }}
 				</option>
 				{% endfor %}
 			</select>
 		</div>
-		<br>
 		<div>
 			Тип объекта:<br>
-			<select id='object_type' onchange="objectTypeSelectChangeValue()">
-				{% set cur_object_type = request.args.get('ot') %}
-				<!-- {% set object_type = ['Квартира', 'Апартамент', 'Кв/ап', 'Машино-место', 'Кладовка', 'Нежилое']  %} -->
+			<select class="custom-select" id='object_type' onchange="SelectChangeValue('object_type', 'ot')">
+				{% set object_type = [
+								{'id': '-1', 'name': 'все типы объектов'},
+								{'id': '1', 'name': 'Квартира'},
+								{'id': '2', 'name': 'Апартамент'},
+								{'id': '3', 'name': 'Машино-место'},
+								{'id': '4', 'name': 'Кладовка'},
+								{'id': '5', 'name': 'Нежилое'},
+								{'id': '6', 'name': 'Кв/ап'}
+								]  %}
 				{% for object_type in object_type %}
-				<option value={{ object_type }} {% if object_type == cur_object_type %} selected {% endif %}>
-					{{ object_type }}
+					<option value={{ object_type.id }} {% if object_type.id == cur_object_type %} selected {% endif %}>
+				{{ object_type.name }}
 				</option>
 				{% endfor %}
 			</select>
 		</div>
-</form>
-	<img src="{{ url_for('square_price_scatter', dev=cur_developer_id, hc=cur_housing_complex_id, h=cur_house_id, ot=cur_object_type) }}"
-		alt="Image Placeholder"
-		height="400">
-	<!-- <img src="{{ url_for('price_boxplot', dev=cur_developer_id, hc=cur_housing_complex_id, h=cur_house_id) }}" -->
-		<!-- alt="Image Placeholder" height="400"> -->
-		<br>
 		<div>
-	Объекты:<br>
-	<table>
-		<tr>
-			<th>id объекта</th>
-			<th>id застройщика</th>
-			<th>кол-во комнат</th>
-			<th>площадь</th>
-			<th>цена</th>
-			<th>цена метра</th>
-			<th>этаж</th>
-			<th>номер на этаже</th>
-			<th>номер в доме</th>
-			<th>студия</th>
-			<th>тип помещения</th>
-			<th>отделка</th>
-			<th>цена со скидкой</th>
-			<!-- <th>источник</th> -->
-		</tr>
-		{% for object in object %}
-		<tr>
-			<td>{{ object.id}}</td>
-			<td>{{ object.developer_id}}</td>
-			<td>{{ object.room}}</td>
-			<td>{{ object.square}}</td>
-			<td>{{ object.price}}</td>
-			<td>{{ object.price_meter}}</td>
-			<td>{{ object.floor}}</td>
-			<td>{{ object.floor_number}}</td>
-			<td>{{ object.house_number}}</td>
-			<td>{{ object.section_number}}</td>
-			<td>{{ object.type_studio}}</td>
-			<td>{{ object.type}}</td>
-			<td>{{ object.decoration}}</td>
-			<td>{{ object.price_discount}}</td>
-			<!-- <td>{{ object.source}}</td> -->
-		</tr>
-		{% endfor %}
-	</table>
-</div>
+			Количество комнат:<br>
+			<select class="custom-select" id='room' onchange="SelectChangeValue('room', 'r')">
+				{% set room = [
+												{'id': '-1', 'name': 'все варианты'},
+												{'id': '0', 'name': '0'},
+												{'id': '1', 'name': '1'},
+												{'id': '2', 'name': '2'},
+												{'id': '3', 'name': '3'},
+												{'id': '4', 'name': '4'}
+												]  %}
+				{% for room in room %}
+				<option value={{ room.id }} {% if room.id == cur_room %} selected {% endif %}>
+					{{ room.name }}
+				</option>
+				{% endfor %}
+			</select>
+		</div>
+		<div>
+			Отделка:<br>
+			<select class="custom-select" id='decoration' onchange="SelectChangeValue('decoration', 'dec')">
+				{% set decoration = [
+												{'id': '-1', 'name': 'все варианты'},
+												{'id': '0', 'name': '0 - Нет'},
+												{'id': '1', 'name': '1 - Есть'},
+												{'id': '3', 'name': '3 - Неизвестно'},
+												]  %}
+				{% for decoration in decoration %}
+				<option value={{ decoration.id }} {% if decoration.id == cur_decoration %} selected {% endif %}>
+					{{ decoration.name }}
+				</option>
+				{% endfor %}
+			</select>
+		</div>
+		<div>
+			Цена, от:<br>
+			<select class="custom-select" id='price_min' onchange="SelectChangeValue('price_min', 'price_min')">
+				{% set price_min = [
+												{'id': '-1', 'name': 'без ограничений'},
+												{'id': '2000000', 'name': '2 млн.р.'},
+												{'id': '5000000', 'name': '5 млн.р.'},
+												{'id': '10000000', 'name': '10 млн.р.'},
+												{'id': '20000000', 'name': '20 млн.р.'},
+												{'id': '50000000', 'name': '50 млн.р.'},
+												{'id': '100000000', 'name': '100 млн.р.'},
+												{'id': '200000000', 'name': '200 млн.р.'},
+												]  %}
+				{% for price_min in price_min %}
+				<option value={{ price_min.id }} {% if price_min.id == cur_price_min %} selected {% endif %}>
+					{{ price_min.name }}
+				</option>
+				{% endfor %}
+			</select>
+		</div>
+		<div>
+			Цена, до:<br>
+			<select class="custom-select" id='price_max' onchange="SelectChangeValue('price_max', 'price_max')">
+				{% set price_max = [
+												{'id': '-1', 'name': 'без ограничений'},
+												{'id': '2000000', 'name': '2 млн.р.'},
+												{'id': '5000000', 'name': '5 млн.р.'},
+												{'id': '10000000', 'name': '10 млн.р.'},
+												{'id': '20000000', 'name': '20 млн.р.'},
+												{'id': '50000000', 'name': '50 млн.р.'},
+												{'id': '100000000', 'name': '100 млн.р.'},
+												{'id': '200000000', 'name': '200 млн.р.'},
+												]  %}
+				{% for price_max in price_max %}
+				<option value={{ price_max.id }} {% if price_max.id == cur_price_max %} selected {% endif %}>
+					{{ price_max.name }}
+				</option>
+				{% endfor %}
+			</select>
+		</div>
+		<div>
+			Общая площадь, от:<br>
+			<select class="custom-select" id='square_min' onchange="SelectChangeValue('square_min', 'square_min')">
+				{% set square_min = [
+												{'id': '-1', 'name': 'без ограничений'},
+												{'id': '20', 'name': '20 кв.м.'},
+												{'id': '30', 'name': '30 кв.м.'},
+												{'id': '40', 'name': '40 кв.м.'},
+												{'id': '60', 'name': '60 кв.м.'},
+												{'id': '100', 'name': '100 кв.м.'},
+												{'id': '150', 'name': '150 кв.м.'},
+												{'id': '200', 'name': '200 кв.м.'}
+												]  %}
+				{% for square_min in square_min %}
+				<option value={{ square_min.id }} {% if square_min.id == cur_square_min %} selected {% endif %}>
+					{{ square_min.name }}
+				</option>
+				{% endfor %}
+			</select>
+		</div>
+		<div>
+			Общая площадь, до:<br>
+			<select class="custom-select" id='square_max' onchange="SelectChangeValue('square_max', 'square_max')">
+				{% set square_max = [
+												{'id': '-1', 'name': 'без ограничений'},
+												{'id': '20', 'name': '20 кв.м.'},
+												{'id': '30', 'name': '30 кв.м.'},
+												{'id': '40', 'name': '40 кв.м.'},
+												{'id': '60', 'name': '60 кв.м.'},
+												{'id': '100', 'name': '100 кв.м.'},
+												{'id': '150', 'name': '150 кв.м.'},
+												{'id': '200', 'name': '200 кв.м.'}
+												]  %}
+				{% for square_max in square_max %}
+				<option value={{ square_max.id }} {% if square_max.id == cur_square_max %} selected {% endif %}>
+					{{ square_max.name }}
+				</option>
+				{% endfor %}
+			</select>
+		</div>
+		<div>
+			Только студии:<br>
+			<select class="custom-select" id='is_studio' onchange="SelectChangeValue('is_studio', 'is_studio')">
+				{% set is_studio = [
+														{'id': '-1', 'name': 'без ограничений'},
+														{'id': '1', 'name': 'Да'}
+														]  %}
+				{% for is_studio in is_studio %}
+				<option value={{ is_studio.id }} {% if is_studio.id == cur_is_studio %} selected {% endif %}>
+					{{ is_studio.name }}
+				</option>
+				{% endfor %}
+			</select>
+		</div>
+		<div>
+			Класс дома:<br>
+			<select class="custom-select" id='house_class' onchange="SelectChangeValue('house_class', 'hclass')">
+				{% set house_class = [
+														{'id': '-1', 'name': 'без ограничений'},
+														{'id': '1', 'name': 'комфорт'},
+														{'id': '2', 'name': 'премиум'},
+														{'id': '3', 'name': 'де-люкс'},
+														{'id': '4', 'name': 'бизнес'},
+														{'id': '5', 'name': 'эконом'},
+														{'id': '6', 'name': 'эконом (панель)'}
+														]  %}
+				{% for house_class in house_class %}
+				<option value={{ house_class.id }} {% if house_class.id == cur_house_class %} selected {% endif %}>
+					{{ house_class.name }}
+				</option>
+				{% endfor %}
+			</select>
+		</div>
+		<div>
+			Тип договора:<br>
+			<select class="custom-select" id='agreement' onchange="SelectChangeValue('agreement', 'agr')">
+				{% set agreement = [
+														{'id': '-1', 'name': 'без ограничений'},
+														{'id': '1', 'name': 'ДДУ'},
+														{'id': '2', 'name': 'ДКП'},
+														{'id': '3', 'name': 'ПДКП'},
+														{'id': '4', 'name': 'ЖСК'},
+														{'id': '5', 'name': 'Аукцион'}
+														]  %}
+				{% for agreement in agreement %}
+				<option value={{ agreement.id }} {% if agreement.id == cur_agreement %} selected {% endif %}>
+					{{ agreement.name }}
+				</option>
+				{% endfor %}
+			</select>
+		</div>
+		<div>
+			Этап строительства:<br>
+			<select class="custom-select" id='stage' onchange="SelectChangeValue('stage', 'stage')">
+				{% set stage = [
+														{'id': '-1', 'name': 'без ограничений'},
+														{'id': '1', 'name': 'сдан_ГК'},
+														{'id': '2', 'name': 'идёт отделка'},
+														{'id': '3', 'name': 'котлован'},
+														{'id': '4', 'name': 'верхние этажи'},
+														{'id': '5', 'name': 'нижние этажи'},
+														{'id': '6', 'name': 'Заморожен'}
+														]  %}
+				{% for stage in stage %}
+				<option value={{ stage.id }} {% if stage.id == cur_stage %} selected {% endif %}>
+					{{ stage.name }}
+				</option>
+				{% endfor %}
+			</select>
+		</div>
+		<div>
+			Зона:<br>
+			<select class="custom-select" id='zone' onchange="SelectChangeValue('zone', 'zone')">
+				{% set zone = [
+														{'id': '-1', 'name': 'без ограничений'},
+														{'id': '1', 'name': '1) внутри СК'},
+														{'id': '2', 'name': '2) от СК до ~ТТК'},
+														{'id': '3', 'name': '3) от ~ТТК до МКАД'},
+														{'id': '4', 'name': '4) Москва за МКАД'},
+														{'id': '5', 'name': '5) Н. Москва ближ.'},
+														{'id': '6', 'name': '6) Н. Москва дальн.'},
+														{'id': '7', 'name': '7) МО ближ.'},
+														{'id': '8', 'name': '8) МО ср.'},
+														{'id': '9', 'name': '9) МО дальн.'}
+														]  %}
+				{% for zone in zone %}
+				<option value={{ zone.id }} {% if zone.id == cur_zone %} selected {% endif %}>
+					{{ zone.name }}
+				</option>
+				{% endfor %}
+			</select>
+		</div>
+		<div>
+			Регион города:<br>
+			<select class="custom-select" id='region_city' onchange="SelectChangeValue('region_city', 'rcity')">
+							<option value="-1">без ограничений</option>
+							{% for region_city in region_city %}
+							<option value={{ region_city.id }} {% if region_city.id == cur_region_city %} selected {% endif %}>
+								{{ region_city.name }}
+							</option>
+							{% endfor %}
+
+			</select>
+		</div>
+		<div>
+			Направление:<br>
+			<select class="custom-select" id='district_direction' onchange="SelectChangeValue('district_direction', 'dd')">
+				<option value="-1">без ограничений</option>
+				{% for district_direction in district_direction %}
+				<option value={{ district_direction.id }} {% if district_direction.id == cur_district_direction %} selected {% endif %}>
+					{{ district_direction.name }}
+				</option>
+				{% endfor %}
+		
+			</select>
+		</div>
+		<div>
+			АТД:<br>
+			<select class="custom-select" id='atd' onchange="SelectChangeValue('atd', 'atd')">
+				<option value="-1">без ограничений</option>
+				{% for atd in atd %}
+				<option value={{ atd.id }} {% if atd.id == cur_atd %} selected
+					{% endif %}>
+					{{ atd.name }}
+				</option>
+				{% endfor %}
+
+			</select>
+		</div>
+	</form>
 {% endblock %}
 
+{% block image %}
+
+<img class="img-fluid" src="{{ url_for('square_price_scatter', 
+							dev=cur_developer_id, 
+							hc=cur_housing_complex_id, 
+							h=cur_house_id, 
+							ot=cur_object_type, 
+							r=cur_room, 
+							dec=cur_decoration,
+							price_min=cur_price_min,
+							price_max=cur_price_max,
+							square_min=cur_square_min,
+							square_max=cur_square_max,
+							is_studio=cur_is_studio,
+							hclass=cur_house_class,
+							agr=cur_agreement,
+							stage=cur_stage,
+							zone=cur_zone,
+							rcity=cur_region_city,
+							dd=cur_district_direction,
+							atd=cur_atd
+							)}}" alt="Image Placeholder" height="400">
+{% endblock %}
+
+{% block table %} 
+	<table class="table table-striped table-bordered table-sm">
+		<thead class="thead-dark">
+			<tr>
+				<th scope="col">id объекта</th>
+				<th scope="col">Название ЖК</th>
+				<th scope="col">кол-во комнат</th>
+				<th scope="col">площадь</th>
+				<th scope="col">цена</th>
+				<th scope="col">цена метра</th>
+				<th scope="col">этаж</th>
+				<th scope="col">тип помещения</th>
+				<th scope="col">отделка</th>
+				<th scope="col">класс дома</th>
+				<th scope="col">Договор:Этап:Дата сдачи</th>
+			</tr>
+		</thead>
+		<tbody>
+			{% for object in object %}
+			<tr>
+				<td>{{ object.id}}</td>
+				<td>{{ object.developer_id}}:{{ object.dev_name}}: {{ object.hc_name}} <br> {{ object.house_name}}
+					<br>{{ object.address}}</td>
+				<td>{{ object.room}}</td>
+				<td>{{ object.square}}</td>
+				<td>{{ object.price}}</td>
+				<td>{{ object.price_meter}}</td>
+				<td>{{ object.floor}}</td>
+				<td>{{ object.type}}</td>
+				<td>{{ object.decoration}}</td>
+				<td>{{ object.house_class}}</td>
+				<td>{{ object.house_agreement}}:{{ object.stage}}:{{ object.date_complete}}</td>
+			</tr>
+			{% endfor %}
+		</tbody>
+	</table>
+{% endblock %}

@@ -37,12 +37,15 @@ class HousingComplex(db.Model):
     name_eng = db.Column(db.String(128))
     region = db.Column(db.String(128))
     region_city = db.Column(db.String(128))
+    district_direction_id = db.Column(db.Integer)
     district_direction = db.Column(db.String(64))
+    atd_id = db.Column(db.Integer)
     atd = db.Column(db.String(128))
     zone = db.Column(db.String(128))
     lat = db.Column(db.Float(8, 5))
     lng = db.Column(db.Float(8, 5))
     dt = db.Column(db.DateTime, default=datetime.utcnow)
+    region_city_id = db.Column(db.Integer)
 
     def __repr__(self):
         return '<HousingComplex {}>'.format(self.body)
@@ -86,4 +89,32 @@ class Object(db.Model):
     dt = db.Column(db.DateTime, default=datetime.utcnow)
 
     def __repr__(self):
-        return '<House {}>'.format(self.body)
+        return '<Object {}>'.format(self.body)
+
+
+class RegionCity(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(64))
+    dt = db.Column(db.DateTime, default=datetime.utcnow)
+
+    def __repr__(self):
+        return '<RegionCity {}>'.format(self.body)
+
+
+class DistrictDirection(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(64))
+    dt = db.Column(db.DateTime, default=datetime.utcnow)
+
+    def __repr__(self):
+        return '<DistrictDirection {}>'.format(self.body)
+
+
+class Atd(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(64))
+    dt = db.Column(db.DateTime, default=datetime.utcnow)
+
+    def __repr__(self):
+        return '<Atd {}>'.format(self.body)
+
