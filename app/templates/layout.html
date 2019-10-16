@@ -13,31 +13,39 @@
 	</head>
 	<body>
 		<div>
-			Microblog:
-			<a href="{{ url_for('index') }}">Home2</a>
-			<a href="{{ url_for('login') }}">Login2</a>
-			<a href="{{ url_for('real_estate_base', 
-					dev='0', 
-					hc='0',
-					h='0',
-					ot=-1,
-					room='-1',
-					dec='-1',
-					price_min='2000000',
-					price_max='50000000',
-					square_min='-1',
-					square_max='200',
-					is_studio=-1,
-					hclass=-1,
-					agr=-1,
-					stage=-1,
-					zone=-1,
-					rcity=-1,
-					atd=-1
-					)}}">Real
-				Estate Base</a>
+			<nav class='nav nav-tabs'>
+				<a 
+				{%  if request.path ==  url_for('developer') %}	class="nav-link active"	{% else %} class="nav-link"	{% endif %}
+				 href="{{ url_for('developer') }}">Застройщик</a>
+				<a 
+				{%  if request.path ==  url_for('housing_complex') %} class="nav-link active" {% else %} class="nav-link" {% endif %}
+				href="{{ url_for('housing_complex') }}">ЖК</a>
+				<a {%  if request.path ==  url_for('house') %} class="nav-link active" {% else %} class="nav-link" {% endif %}
+				href="{{ url_for('house') }}">Корпуса</a>
+				<a 
+				{%  if request.path ==  url_for('real_estate_base') %} class="nav-link active" {% else %} class="nav-link" {% endif %}
+				href="{{ url_for('real_estate_base', 
+				dev='0', 
+				hc='0',
+				h='0',
+				ot=-1,
+				room='-1',
+				dec='-1',
+				price_min='2000000',
+				price_max='50000000',
+				square_min='-1',
+				square_max='200',
+				is_studio=-1,
+				hclass=-1,
+				agr=-1,
+				stage=-1,
+				zone=-1,
+				rcity=-1,
+				atd=-1,
+				dd=-1
+				)}}">Аналитика</a>
+			</nav>
 		</div>
-		<hr>
 		<div class="container-fluid">
 			<div class='row'>
 				<div class='col-sm'>

@@ -99,3 +99,13 @@ function SelectChangeValue(element_id, url_name) {
 	// Redirect
 	window.location.replace(url);
 }
+
+function SelectChangeValueWithErase(element_id, url_name) {
+	var url = window.location.origin + window.location.pathname
+
+	var selObj = document.getElementById(element_id);
+	var selValue = selObj.options[selObj.selectedIndex].value;
+	url = updateURLParameter(url, url_name, selValue);
+	// Redirect
+	window.location.replace(url);
+}

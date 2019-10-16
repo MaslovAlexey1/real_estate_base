@@ -19,9 +19,24 @@
 {% set cur_district_direction = request.args.get('dd')|int %}
 {% set cur_atd = request.args.get('atd')|int %}
 
+{% if cur_object_type == None %} {% set cur_object_type=-1 %} {% endif %}
+{% if cur_room == None %} {% set cur_room=-1 %} {% endif %}
+{% if cur_decoration == None %} {% set cur_decoration=-1 %} {% endif %}
+{% if cur_price_min == None %} {% set cur_price_min=-1 %} {% endif %}
+{% if cur_price_max == None %} {% set cur_price_max=-1 %} {% endif %}
+{% if cur_square_min == None %} {% set cur_square_min=-1 %} {% endif %}
+{% if cur_square_max == None %} {% set cur_square_max=-1 %} {% endif %}
+{% if cur_is_studio == None %} {% set cur_is_studio=-1 %} {% endif %}
+{% if cur_house_class == None %} {% set cur_house_class=-1 %} {% endif %}
+{% if cur_agreement == None %} {% set cur_agreement=-1 %} {% endif %}
+{% if cur_stage == None %} {% set cur_stage=-1 %} {% endif %}
+{% if cur_zone == None %} {% set cur_zone=-1 %} {% endif %}
+{% if cur_region_city == 0 %} {% set cur_region_city=-1 %} {% endif %}
+{% if cur_district_direction == 0 %} {% set cur_district_direction=-1 %} {% endif %}
+{% if cur_atd == 0 %} {% set cur_atd=-1 %} {% endif %}
 
 {% block content %}
-	<form mothod="GET" class="form-inline well">
+	<form method="GET" class="form-inline well">
 		<div>
 			Застройщик:<br>
 			<select class="custom-select" id='developer' onchange="developSelectChangeValue()">
@@ -283,7 +298,7 @@
 			</select>
 		</div>
 		<div>
-			Регион города:<br>
+			Район города:<br>
 			<select class="custom-select" id='region_city' onchange="SelectChangeValue('region_city', 'rcity')">
 							<option value="-1">без ограничений</option>
 							{% for region_city in region_city %}
@@ -367,8 +382,15 @@
 			{% for object in object %}
 			<tr>
 				<td>{{ object.id}}</td>
-				<td>{{ object.developer_id}}:{{ object.dev_name}}: {{ object.hc_name}} <br> {{ object.house_name}}
-					<br>{{ object.address}}</td>
+				<td>{{ object.developer_id}}:{{ object.dev_name}} <a href="{{ url_for('developer', developer_id = object.developer_id) }}"> к застройщику</a>
+					<br>
+					{{ object.hc_name}} <a href="{{ url_for('housing_complex', housing_complex_id = object.housing_complex_id) }}"> к
+						ЖК</a>
+					<br> 
+					{{ object.house_name}} <a href="{{ url_for('house', house_id = object.house_id) }}">к корпусу</a>
+					<br>
+					{{ object.address}}
+				</td>
 				<td>{{ object.room}}</td>
 				<td>{{ object.square}}</td>
 				<td>{{ object.price}}</td>

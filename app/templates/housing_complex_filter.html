@@ -1,0 +1,101 @@
+{% extends "layout.html" %}
+
+{% set cur_zone = request.args.get('zone') %}
+{% set cur_region_city = request.args.get('rcity')|int %}
+{% set cur_district_direction = request.args.get('dd')|int %}
+{% set cur_atd = request.args.get('atd')|int %}
+
+{% block content %}
+<div>
+	Зона:<br>
+	<select class="custom-select" id='zone' onchange="SelectChangeValueWithErase('zone', 'zone')">
+		{% set zone = [
+														{'id': '-1', 'name': 'без ограничений'},
+														{'id': '1', 'name': '1) внутри СК'},
+														{'id': '2', 'name': '2) от СК до ~ТТК'},
+														{'id': '3', 'name': '3) от ~ТТК до МКАД'},
+														{'id': '4', 'name': '4) Москва за МКАД'},
+														{'id': '5', 'name': '5) Н. Москва ближ.'},
+														{'id': '6', 'name': '6) Н. Москва дальн.'},
+														{'id': '7', 'name': '7) МО ближ.'},
+														{'id': '8', 'name': '8) МО ср.'},
+														{'id': '9', 'name': '9) МО дальн.'}
+														]  %}
+		{% for zone in zone %}
+		<option value={{ zone.id }} {% if zone.id == cur_zone %} selected {% endif %}>
+			{{ zone.name }}
+		</option>
+		{% endfor %}
+	</select>
+</div>
+<div>
+	Регион города:<br>
+	<select class="custom-select" id='region_city' onchange="SelectChangeValueWithErase('region_city', 'rcity')">
+		<option value="-1">без ограничений</option>
+		{% for region_city in region_city %}
+		<option value={{ region_city.id }} {% if region_city.id == cur_region_city %} selected {% endif %}>
+			{{ region_city.name }}
+		</option>
+		{% endfor %}
+
+	</select>
+</div>
+<div>
+	Направление:<br>
+	<select class="custom-select" id='district_direction' onchange="SelectChangeValueWithErase('district_direction', 'dd')">
+		<option value="-1">без ограничений</option>
+		{% for district_direction in district_direction %}
+		<option value={{ district_direction.id }} {% if district_direction.id == cur_district_direction %} selected
+			{% endif %}>
+			{{ district_direction.name }}
+		</option>
+		{% endfor %}
+
+	</select>
+</div>
+<div>
+	АТД:<br>
+	<select class="custom-select" id='atd' onchange="SelectChangeValueWithErase('atd', 'atd')">
+		<option value="-1">без ограничений</option>
+		{% for atd in atd %}
+		<option value={{ atd.id }} {% if atd.id == cur_atd %} selected {% endif %}>
+			{{ atd.name }}
+		</option>
+		{% endfor %}
+
+	</select>
+</div>
+<h1>
+	жк
+</h1>
+<table class="table table-striped table-bordered table-sm">
+	<thead class="thead-dark">
+		<tr>
+			<th scope="col">Название ЖК </th>
+			<th scope="col">регион</th>
+			<th scope="col">район города</th>
+			<th scope="col">направление</th>
+			<th scope="col">АТД</th>
+			<th scope="col">зона</th>
+			<th scope="col">широта : долгота</th>
+		</tr>
+	</thead>
+	<tbody>
+		{% for housing_complex in housing_complex %}
+		<tr>
+			<td>{{ housing_complex.id}}: {{ housing_complex.name}}<a
+					href="{{ url_for('housing_complex', housing_complex_id=housing_complex.id) }}"><span
+						class="badge badge-info">=></span></a>
+					<a href="{{ url_for('real_estate_base', dev=housing_complex.developer_id, hc=housing_complex.id) }}"><span
+							class="badge badge-success">аналитика</span></td>
+			<td>{{ housing_complex.region}}</td>
+			<td>{{ housing_complex.region_city}}</td>
+			<td>{{ housing_complex.district_direction}}</td>
+			<td>{{ housing_complex.atd}}</td>
+			<td>{{ housing_complex.zone}}</td>
+			<td>{{ housing_complex.lat}} : {{ housing_complex.lng}}</td>
+		</tr>
+		{% endfor %}
+	</tbody>
+</table>
+{% endblock %}
