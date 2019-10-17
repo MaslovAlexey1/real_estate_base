@@ -24,7 +24,6 @@ jedi==0.15.1
 Jinja2==2.10.3
 jsonschema==3.0.2
 jupyter==1.0.0
-jupyter-client==5.3.3
 jupyter-console==6.0.0
 jupyter-core==4.5.0
 kiwisolver==1.1.0
@@ -43,6 +42,7 @@ pandocfilters==1.4.2
 parso==0.5.1
 pep8==1.7.1
 pickleshare==0.7.5
+pipdeptree==0.13.2
 prometheus-client==0.7.1
 prompt-toolkit==2.0.10
 pycodestyle==2.5.0
