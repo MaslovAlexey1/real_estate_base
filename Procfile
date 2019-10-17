@@ -1,0 +1,1 @@
+web: flask db upgrade; flask translate compile; gunicorn real_estate_base:app
