@@ -5,11 +5,13 @@
 	застройщики
 </h1>
 
-
 <table class="table table-striped table-bordered table-sm">
 	<thead class="thead-dark">
 		<tr>
-			<th scope="col">Название</th>
+			<th scope="col">название застройщика</th>
+			<th scope="col">средняя цена кв/ап</th>
+			<th scope="col">количество кв/ап</th>
+			<th scope="col">количество ЖК</th>
 		</tr>
 	</thead>
 	<tbody>
@@ -17,8 +19,18 @@
 		<tr>
 			<td>{{ developer.id}}: {{ developer.name}} 
 				<a href="{{ url_for('developer', developer_id=developer.id) }}"><span class="badge badge-info">список ЖК</span></a>
-				<a href="{{ url_for('real_estate_base', dev=developer.id) }}"><span class="badge badge-success">аналитика</span></a>
+				<a href="{{ url_for('real_estate_base', dev=developer.id) }}"><img src="/static/fonts/icons8-web-analytics-24.png"></img></a>
+				
 
+			</td>
+			<td>
+				{{ "RUB {:,.0f}".format(developer.price) }}
+			</td>
+			<td>
+				{{ developer.count_object }}
+			</td>
+			<td>
+				{{ developer.count_housing_complex }}
 			</td>
 		</tr>
 		{% endfor %}

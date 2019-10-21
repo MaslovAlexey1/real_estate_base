@@ -22,8 +22,8 @@
 		<tr>
 			<td>{{ house.id}}: {{ house.name}} <a href="{{ url_for('house', house_id=house.id) }}"><span
 						class="badge badge-info">=></span></a> <a
-							href="{{ url_for('real_estate_base', dev=house.developer_id, hc=house.housing_complex_id, h=house.id) }}"><span
-								class="badge badge-success">аналитика</span></a></td>
+							href="{{ url_for('real_estate_base', dev=house.developer_id, hc=house.housing_complex_id, h=house.id) }}"><img
+								src="/static/fonts/icons8-web-analytics-24.png"></img></a></td>
 			<td>{{ house.address}}</td>
 			<td>{{ house.house_type}}</td>
 			<td>{{ house.house_class}}</td>

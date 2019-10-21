@@ -19,7 +19,6 @@ Flask==1.1.1
 Flask-Migrate==2.5.2
 Flask-SQLAlchemy==2.4.1
 Flask-WTF==0.14.2
-gunicorn==19.9.0
 identify==1.4.7
 idna==2.8
 importlib-metadata==0.23
@@ -88,7 +87,6 @@ toml==0.10.0
 tornado==6.0.3
 tox==3.14.0
 traitlets==4.3.3
-translate==3.5.0
 typed-ast==1.4.0
 urllib3==1.25.6
 virtualenv==16.7.6

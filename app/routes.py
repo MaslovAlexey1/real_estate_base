@@ -16,24 +16,56 @@ sns.set()
 @app.route('/')
 @app.route('/index')
 def index():
-	developer = Developer.query.all()
+	return redirect('/developer/', code=302)
 
-	return render_template('index.html',
-                        developer=developer
+
+@app.route('/geo/')
+def geo():
+	atd = Atd.query.all()
+	region_city = RegionCity.query.all()
+	district_direction = DistrictDirection.query.all()
+
+	return render_template('geo.html',
+                        atd=atd,
+                        region_city=region_city,
+                        district_direction=district_direction
                         )
-
 
 @app.route('/developer/')
 @app.route('/developer/<developer_id>')
 def developer(developer_id=-1):
 	if developer_id == -1 :
-		developer = Developer.query.all()
+		sql_query = 'select d.id, d.name, avg(o.price) price, count(o.id) count_object, count(distinct o.housing_complex_id) count_housing_complex \
+					from developer d \
+					join object o on d.id = o.developer_id \
+					where o.type in (\'Квартира\', \'Апартамент\', \'Кв/ап\') \
+					group by d.id '
+		conn = 'sqlite:///app.db'
+		Session = sessionmaker()
+		engine = create_engine(conn)
+		Session.configure(bind=engine)
+		session = Session()
+		developer = session.execute(sql_query)
+		# developer = Developer.query.all()
 		return render_template('index.html', developer=developer
                          )
 
 	developer = Developer.query.get(developer_id)
 
-	housing_complex = HousingComplex.query.filter_by(developer_id=developer_id)
+	sql_query = 'select hc.*, avg(o.price) price, count(o.id) count_object, count(distinct o.housing_complex_id) count_housing_complex \
+					from housing_complex hc \
+					join object o on hc.id = o.housing_complex_id \
+					where hc.developer_id = ' + developer_id + ' \
+					and o.type in (\'Квартира\', \'Апартамент\', \'Кв/ап\') \
+					group by hc.id '
+	conn = 'sqlite:///app.db'
+	Session = sessionmaker()
+	engine = create_engine(conn)
+	Session.configure(bind=engine)
+	session = Session()
+	housing_complex = session.execute(sql_query)
+
+	# housing_complex = HousingComplex.query.filter_by(developer_id=developer_id)
 
 	return render_template('developer.html',
 							developer = developer,
@@ -72,7 +104,7 @@ def housing_complex(housing_complex_id=-1):
 		elif atd_id != -1:
 			housing_complex = HousingComplex.query.filter_by(atd_id=atd_id)
 		else:
-			housing_complex = HousingComplex.query.limit(100)
+			housing_complex = HousingComplex.query.all()
 
 		
 		return render_template('housing_complex_filter.html',
@@ -96,7 +128,7 @@ def housing_complex(housing_complex_id=-1):
 @app.route('/house/<house_id>')
 def house(house_id=-1):
 	if house_id == -1:
-		house = House.query.limit(100)
+		house = House.query.limit(500)
 		return render_template('house_filter.html',
                          house=house
                          )
@@ -209,7 +241,7 @@ def real_estate_base():
 	sql_region_city = ' and hc.region_city_id = ' + str(region_city_id) if region_city_id != -1 else ''
 	sql_district_direction = ' and hc.district_direction_id = ' + str(district_direction_id) if district_direction_id != -1 else ''
 	sql_atd = ' and hc.atd_id = ' + str(atd_id) if atd_id != -1 else ''
-	sql_limit = ' limit 20 '
+	sql_limit = ' limit 500 '
 	sql_order = ' '
 
 	if developer_id == 0:

@@ -12,6 +12,9 @@
 
 <h1>
 	{{ housing_complex.id }}: {{ housing_complex.name }}
+	<a href="{{ url_for('real_estate_base', dev=housing_complex.developer_id, hc=housing_complex.id) }}"><img
+			src="/static/fonts/icons8-web-analytics-24.png"></img>
+	</a>
 </h1>
 
 <h1>
@@ -35,8 +38,8 @@
 		<tr>
 			<td>{{ house.id}}: {{ house.name}} <a
 					href="{{ url_for('house', house_id=house.id) }}"><span class="badge badge-info">=></span></a>
-				<a href="{{ url_for('real_estate_base', dev=housing_complex.developer_id, hc=housing_complex.id, h=house.id) }}"><span
-						class="badge badge-success">аналитика</span></a>
+				<a href="{{ url_for('real_estate_base', dev=housing_complex.developer_id, hc=housing_complex.id, h=house.id) }}"><img
+						src="/static/fonts/icons8-web-analytics-24.png"></img></a>
 					</td>
 			<td>{{ house.address}}</td>
 			<td>{{ house.house_type}}</td>

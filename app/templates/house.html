@@ -16,6 +16,9 @@
 
 <h1>
 	{{ house.id }}: {{ house.name }}
+						<a href="{{ url_for('real_estate_base', dev=house.developer_id, hc=house.housing_complex_id, h=house.id) }}"><img
+								src="/static/fonts/icons8-web-analytics-24.png"></img>
+						</a>
 </h1>
 <h1>
 	объекты
@@ -41,8 +44,8 @@
 			<td>{{ object.id}}</td>
 			<td>{{ object.room}}</td>
 			<td>{{ object.square}}</td>
-			<td>{{ object.price}}</td>
-			<td>{{ object.price_meter}}</td>
+			<td>{{ "RUB {:,.0f}".format(object.price) }}</td>
+			<td>{{ "RUB {:,.0f}".format(object.price_meter) }}</td>
 			<td>{{ object.floor}}</td>
 			<td>{{ object.type_studio}}</td>
 			<td>{{ object.type}}</td>

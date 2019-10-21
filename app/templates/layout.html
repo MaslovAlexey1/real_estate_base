@@ -22,6 +22,8 @@
 				href="{{ url_for('housing_complex') }}">ЖК</a>
 				<a {%  if request.path ==  url_for('house') %} class="nav-link active" {% else %} class="nav-link" {% endif %}
 				href="{{ url_for('house') }}">Корпуса</a>
+				<a {%  if request.path ==  url_for('geo') %} class="nav-link active" {% else %} class="nav-link" {% endif %}
+				href="{{ url_for('geo') }}">Геофильтры</a>
 				<a 
 				{%  if request.path ==  url_for('real_estate_base') %} class="nav-link active" {% else %} class="nav-link" {% endif %}
 				href="{{ url_for('real_estate_base', 
@@ -46,19 +48,21 @@
 				)}}">Аналитика</a>
 			</nav>
 		</div>
-		<div class="container-fluid">
+		<div class="container">
 			<div class='row'>
 				<div class='col-sm'>
 					{% block content %}{% endblock %}
 				</div>
 			</div>
-			<div class='row border' style='height: 700px'>
+			<div class='row'>
 				<div class='col-sm'>
 					{% block image %} {% endblock %}
 				</div>
 			</div>
 			<div class="row">
 				{% block table %} {% endblock %}
+			</div>
+			<div class="footer" style="height:100px;">
 			</div>
 		</div>
 

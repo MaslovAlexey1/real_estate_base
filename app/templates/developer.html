@@ -8,38 +8,37 @@
 </ul>
 <h1>
 	{{ developer.id }}: {{ developer.name }}
+	<a href="{{ url_for('real_estate_base', dev=developer.id) }}"><img
+			src="/static/fonts/icons8-web-analytics-24.png"></img>
+	</a>
 </h1>
 
-ЖК:
 <table class="table table-striped table-bordered table-sm">
 	<thead class="thead-dark">
 		<tr>
-			<th scope="col">Название ЖК </th>
-			<th scope="col">регион</th>
-			<th scope="col">район города</th>
-			<th scope="col">направление</th>
-			<th scope="col">АТД</th>
+			<th scope="col">название ЖК </th>
+			<th scope="col">район города / направление / АТД</th>
 			<th scope="col">зона</th>
-			<th scope="col">широта : долгота</th>
+			<th scope="col">средняя цена кв/ап</th>
+			<th scope="col">кол-во кв/ап</th>
 		</tr>
 	</thead>
 	<tbody>
 		{% for housing_complex in housing_complex %}
 		<tr>
-			<td>{{ housing_complex.id}}: {{ housing_complex.name}}<a
+			<td>{{ housing_complex.id}}: {{ housing_complex.name}} <a
 					href="{{ url_for('housing_complex', housing_complex_id=housing_complex.id) }}"><span
 						class="badge badge-info">=></span></a>
-					<a href="{{ url_for('real_estate_base', dev=housing_complex.developer_id, hc=housing_complex.id) }}"><span
-							class="badge badge-success">аналитика</span></a>
+					<a href="{{ url_for('real_estate_base', dev=housing_complex.developer_id, hc=housing_complex.id) }}"><img
+							src="/static/fonts/icons8-web-analytics-24.png"></img></a>
+							<br>
+							{{ housing_complex.region}}
 						</td>
-			<td>{{ housing_complex.region}}</td>
-			<td>{{ housing_complex.region_city}}<a
+			<td>{{ housing_complex.region_city}} <a
 					href="{{ url_for('housing_complex', rcity=housing_complex.region_city_id) }}"><span
-						class="badge badge-info">=></span></a></td>
-			<td>{{ housing_complex.district_direction}}<a
+						class="badge badge-info">=></span></a> <br> {{ housing_complex.district_direction}} <a
 					href="{{ url_for('housing_complex', dd=housing_complex.district_direction_id) }}"><span
-						class="badge badge-info">=></span></a></td>
-			<td>{{ housing_complex.atd}}<a
+						class="badge badge-info">=></span></a> <br> {{ housing_complex.atd}} <a
 					href="{{ url_for('housing_complex', atd=housing_complex.atd_id) }}"><span class="badge badge-info">=></span></a>
 					</td>
 					{% set zone = [
@@ -56,12 +55,17 @@
 														]  %}
 					{% for zone in zone %}
 						{% if zone.name == housing_complex.zone %} 
-							<td>{{ housing_complex.zone}}<a href="{{ url_for('housing_complex', zone=zone.id) }}"><span
+							<td>{{ housing_complex.zone}} <a href="{{ url_for('housing_complex', zone=zone.id) }}"><span
 										class="badge badge-info">=></span></a></td>
 						{% endif %}
 					{% endfor %}
 			
-			<td>{{ housing_complex.lat}} : {{ housing_complex.lng}}</td>
+			<td>
+				{{ "RUB {:,.0f}".format(housing_complex.price) }}
+			</td>
+			<td>
+				{{ housing_complex.count_object }}
+			</td>
 		</tr>
 		{% endfor %}
 	</tbody>
