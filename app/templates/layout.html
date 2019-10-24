@@ -65,8 +65,15 @@
 				</div>
 			</div>
 			<div class="row">
+				{% block table_housing_complex %} {% endblock %}
+			</div>
+			{% set cur_housing_complex_id = request.args.get('hc')|int %}
+
+			{% if cur_housing_complex_id > 0 %}
+			<div class="row">
 				{% block table %} {% endblock %}
 			</div>
+			{% endif %}
 			<div class="footer" style="height:100px;">
 			</div>
 		</div>

@@ -256,6 +256,7 @@ def real_estate_base():
 	sql_atd = ' and hc.atd_id = ' + str(atd_id) if atd_id != -1 else ''
 	sql_dc_min = ' and h.date_complete_id >= ' + str(dc_min) if dc_min != -1 else ''
 	sql_dc_max = ' and h.date_complete_id <= ' + str(dc_max) if dc_max != -1 else ''
+	sql_group_by = ' '
 	sql_limit = ' limit 500 '
 	sql_order = ' '
 
@@ -280,13 +281,27 @@ def real_estate_base():
 	            sql_price_min + sql_price_max + sql_square_min + sql_square_max + sql_is_studio + sql_dev_hc_h + \
 				sql_hclass + sql_agreement + sql_stage + sql_zone + sql_region_city + sql_district_direction + sql_atd + \
             sql_dc_min + sql_dc_max +\
-				sql_order + sql_limit
+				sql_group_by + sql_order + sql_limit
 
 	Session = sessionmaker()
 	engine = create_engine(conn)
 	Session.configure(bind=engine)
 	session = Session()
 	object = session.execute(sql_query)
+
+	sql_select = 'select  o.developer_id, o.housing_complex_id, min(o.square) min_square, avg(o.square) avg_square, max(o.square) max_square,\
+		min(o.price) min_price, avg(o.price) avg_price, max(o.price) max_price, \
+	hc.name hc_name, hc.region_city, hc.zone, hc.lat, hc.lng, d.name dev_name \
+	from object o '
+	sql_group_by = ' group by o.developer_id, o.housing_complex_id '
+
+	sql_query = sql_select + sql_join_house + sql_join_housing_complex + sql_join_dev + sql_where_1_1 + sql_object_type + sql_room + sql_decoration + \
+            sql_price_min + sql_price_max + sql_square_min + sql_square_max + sql_is_studio + sql_dev_hc_h + \
+            sql_hclass + sql_agreement + sql_stage + sql_zone + sql_region_city + sql_district_direction + sql_atd + \
+            sql_dc_min + sql_dc_max +\
+            sql_group_by + sql_order + sql_limit
+
+	housing_complex_filter = session.execute(sql_query)
 
 
 	return render_template('analytics.html', title='Real Estate Base',
@@ -297,12 +312,16 @@ def real_estate_base():
 		region_city = region_city,
 		district_direction=district_direction,
 		atd = atd,
-		date_complete = date_complete
+		date_complete = date_complete,
+                        housing_complex_filter=housing_complex_filter
 		)
 
 
 @app.route('/square_price_scatter/')
 def square_price_scatter():
+	plot_type = request.args.get('plot_type')
+	plot_type = plot_type if plot_type is not None else 'dev'
+	
 	developer_id = request.args.get('dev')
 	developer_id = int(developer_id) if developer_id is not None else 0
 
@@ -371,6 +390,7 @@ def square_price_scatter():
 	sql_select = 'select o.room, o.square, o.price, o.type from object o '
 	sql_join_house = ' join house h on o.house_id = h.id '
 	sql_join_housing_complex = ' join housing_complex hc on o.housing_complex_id = hc.id '
+	sql_join_dev = ' join developer d on o.developer_id = d.id  '
 	sql_where_1_1 = ' where 1=1 '
 	sql_room = ' and o.room = ' + str(room) if room >= 0 else ''
 	sql_object_type = ' and o.type = "' + str(object_type) + '"' if object_type != -1 else ''
@@ -390,6 +410,7 @@ def square_price_scatter():
 	sql_atd = ' and hc.atd_id = ' + str(atd_id) if atd_id != -1 else ''
 	sql_dc_min = ' and h.date_complete_id >= ' + str(dc_min) if dc_min != -1 else ''
 	sql_dc_max = ' and h.date_complete_id <= ' + str(dc_max) if dc_max != -1 else ''
+	sql_group_by = ' '
 	sql_order = ' '
 	sql_limit = ' '
 
@@ -404,19 +425,48 @@ def square_price_scatter():
 		sql_dev_hc_h = ' and o.house_id = ' + str(house_id)
 
 	conn = 'sqlite:///app.db'
-	df = pd.read_sql(sql_select + sql_join_house + sql_join_housing_complex + sql_where_1_1 + sql_object_type + sql_decoration + sql_room +
-	                sql_price_min + sql_price_max + sql_square_min + sql_square_max + sql_is_studio + sql_dev_hc_h + 
-					sql_hclass + sql_agreement + sql_stage + sql_zone + sql_region_city + sql_district_direction + sql_atd +\
-					sql_dc_min + sql_dc_max +\
-					sql_order + sql_limit, conn)
-	
-	df['price'] = pd.to_numeric(df['price'])
-	df['square'] = pd.to_numeric(df['square'])
+	sql_query1 = sql_select + sql_join_house + sql_join_housing_complex + sql_join_dev +\
+            sql_where_1_1 + sql_object_type + sql_decoration + sql_room +\
+            sql_price_min + sql_price_max + sql_square_min + sql_square_max + sql_is_studio + sql_dev_hc_h +\
+            sql_hclass + sql_agreement + sql_stage + sql_zone + sql_region_city + sql_district_direction + sql_atd +\
+            sql_dc_min + sql_dc_max +\
+            sql_group_by + sql_order + sql_limit
 
-	g = sns.scatterplot(x='square', y='price', hue='room', style='type', s=100, alpha=0.8,
-	                    data=df, palette="Set2", legend='full')
-	plt.xlim(0, None)
+
+	sql_select = 'select  o.developer_id, o.housing_complex_id, avg(o.square) square,\
+		avg(o.price) price, \
+	hc.name hc_name, hc.region_city, hc.zone, hc.lat, hc.lng, d.name dev_name \
+	from object o '
+	sql_group_by = ' group by o.developer_id, o.housing_complex_id '
+
+	sql_query2 = sql_select + sql_join_house + sql_join_housing_complex + sql_join_dev +\
+            sql_where_1_1 + sql_object_type + sql_decoration + sql_room +\
+            sql_price_min + sql_price_max + sql_square_min + sql_square_max + sql_is_studio + sql_dev_hc_h +\
+            sql_hclass + sql_agreement + sql_stage + sql_zone + sql_region_city + sql_district_direction + sql_atd +\
+            sql_dc_min + sql_dc_max +\
+            sql_group_by + sql_order + sql_limit
+
+	if plot_type=='hc':
+		df = pd.read_sql(sql_query1, conn)
+		df['price'] = pd.to_numeric(df['price'])
+		df['square'] = pd.to_numeric(df['square'])
+		g = sns.scatterplot(x='square', y='price',  hue='room', style='type', s=100, alpha=0.8,
+							data=df, palette="Set2", legend='full')
+	else:
+		df = pd.read_sql(sql_query2, conn)
+		df['price'] = pd.to_numeric(df['price'])
+		df['square'] = pd.to_numeric(df['square'])
+		g = sns.scatterplot(x='square', y='price', hue='dev_name',  s=100, alpha=0.8,
+							data=df, palette="Set2", legend='full')
+
+	
 	plt.tight_layout()
+
+	# Shrink current axis by 20%
+	box = g.get_position()
+	g.set_position([box.x0, box.y0, box.width * 0.6, box.height])
+
+	plt.legend(bbox_to_anchor=(1.04, 1), loc="upper left")
 
 	formatter = FuncFormatter(millions)
 	g.yaxis.set_major_formatter(formatter)

@@ -109,6 +109,23 @@ function inputSelectChangeValue(element_id, url_name) {
 	window.location.replace(url);
 }
 
+function datasetSelectChangeValue(element_id, url_name) {
+	var url = window.location.href
+
+	var selObj = document.getElementById(element_id);
+	var selValue = selObj.dataset.value;
+	url = updateURLParameter(url, url_name, selValue);
+	// Redirect
+	window.location.replace(url);
+}
+
+function setFilterHousingComplex(hc_id) {
+
+	var selObj = document.getElementById('housing_complex');
+	selObj.value = hc_id;
+	housingComplexSelectChangeValue()
+}
+
 function SelectChangeValueWithErase(element_id, url_name) {
 	var url = window.location.origin + window.location.pathname
 

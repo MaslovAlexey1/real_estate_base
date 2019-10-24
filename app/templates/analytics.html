@@ -337,7 +337,14 @@
 
 {% block image %}
 
+{% if cur_housing_complex_id > 0 %}
+	{% set plot_type = 'hc' %}
+{% else %}
+	{% set plot_type = 'dev' %}
+{% endif %}
+
 <img class="img-fluid" src="{{ url_for('square_price_scatter', 
+							plot_type=plot_type,
 							dev=cur_developer_id, 
 							hc=cur_housing_complex_id, 
 							h=cur_house_id, 
@@ -359,9 +366,59 @@
 							dc_min=cur_dc_min,
 							dc_max=cur_dc_max
 							)}}" alt="Image Placeholder" height="400">
+
 {% endblock %}
 
+{% block table_housing_complex %}
+	<table class="table table-striped table-bordered table-sm">
+		<thead class="thead-dark">
+			<tr>
+				<th scope="col">Название ЖК</th>
+				<th scope="col">цена</th>
+				<th scope="col">площадь</th>
+				<th scope="col">расположение</th>
+			</tr>
+		</thead>
+		<tbody>
+	{% for housing_complex_filter in housing_complex_filter %}
+			<tr>
+				<td>
+					<b>
+						{{housing_complex_filter.hc_name}}
+					</b>
+					<a href="{{ url_for('housing_complex', housing_complex_id = housing_complex_filter.housing_complex_id) }}"> к
+						ЖК</a>
+						<button type="button"
+							onclick="setFilterHousingComplex({{ housing_complex_filter.housing_complex_id}})">фильтр</button>
+					<br>
+					{{housing_complex_filter.dev_name}} <a
+						href="{{ url_for('developer', developer_id = housing_complex_filter.developer_id) }}"> к
+						застройщику</a>
+				</td>
+				<td>
+					от: {{ "RUB {:,.0f}".format(housing_complex_filter.min_price) }} <br>
+					ср: {{ "RUB {:,.0f}".format(housing_complex_filter.avg_price) }} <br>
+					до: {{ "RUB {:,.0f}".format(housing_complex_filter.max_price) }}
+				</td>
+				<td>
+					от: {{ "{:,.0f}".format(housing_complex_filter.min_square) }} <br>
+					ср: {{ "{:,.0f}".format(housing_complex_filter.avg_square) }} <br>
+					до: {{ "{:,.0f}".format(housing_complex_filter.max_square) }}
+				</td>
+				<td>
+					{{housing_complex_filter.region_city}} <br>
+					{{housing_complex_filter.zone}}
+				</td>
+			</tr>
+	{% endfor %}
+	</tbody>
+	</table>
+
+{% endblock %}
+
+
 {% block table %} 
+
 	<table class="table table-striped table-bordered table-sm">
 		<thead class="thead-dark">
 			<tr>
