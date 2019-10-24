@@ -1,0 +1,45 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<h1>
+	быстрые действия
+</h1>
+<a href="{{ url_for('real_estate_base', 
+			r=1, 
+			dec=1,
+			ot=1,
+			price_min=2800000,
+			price_max=3500000,
+			dc_min=20190101,
+			dc_max=20201001
+			) }}">
+	<div class="d-block p-2 bg-primary text-white">
+		1к квартира с отделкой бюджет около 3 млн. рублей. Сроки сдачи 2019,2020
+	</div>
+</a>
+<a href="{{ url_for('real_estate_base', 
+			r=2, 
+			dec=1,
+			ot=1,
+			price_min=5800000,
+			price_max=6500000,
+			dc_max=20211001
+			) }}">
+	<div class="d-block p-2 bg-dark text-white">
+		2к квартира с отделкой, сдача дома до конца 2020-2021 года, бюджет 6 млн. руб.
+	</div>
+</a>
+
+<a href="{{ url_for('real_estate_base', 
+			r=1, 
+			ot=1,
+			price_min=3800000,
+			price_max=4500000,
+			dc_max=20211001
+			) }}">
+	<div class="d-block p-2 bg-primary text-white">
+		1к квартира, отделка не имеет значение,сдача дома до конца 2021 года, бюджет 4 млн. руб.
+	</div>
+</a>
+
+{% endblock %}

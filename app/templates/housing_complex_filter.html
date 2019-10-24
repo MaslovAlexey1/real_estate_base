@@ -92,7 +92,8 @@
 						{{ housing_complex.region}}
 					</td>
 			<td>{{ housing_complex.region_city}}
-				<a href="{{ url_for('housing_complex', rcity=region_city.id) }}"><span class="badge badge-info">=></span></a>
+				<a href="{{ url_for('housing_complex', rcity=housing_complex.region_city_id) }}"><span
+						class="badge badge-info">=></span></a>
 			</td>
 			<td>{{ housing_complex.district_direction}}</td>
 			<td>{{ housing_complex.atd}}</td>

@@ -18,6 +18,8 @@
 {% set cur_region_city = request.args.get('rcity')|int %}
 {% set cur_district_direction = request.args.get('dd')|int %}
 {% set cur_atd = request.args.get('atd')|int %}
+{% set cur_dc_min = request.args.get('dc_min')|int %}
+{% set cur_dc_max = request.args.get('dc_max')|int %}
 
 {% if cur_object_type == None %} {% set cur_object_type=-1 %} {% endif %}
 {% if cur_room == None %} {% set cur_room=-1 %} {% endif %}
@@ -34,6 +36,8 @@
 {% if cur_region_city == 0 %} {% set cur_region_city=-1 %} {% endif %}
 {% if cur_district_direction == 0 %} {% set cur_district_direction=-1 %} {% endif %}
 {% if cur_atd == 0 %} {% set cur_atd=-1 %} {% endif %}
+{% if cur_dc_min == 0 %} {% set cur_dc_min=-1 %} {% endif %}
+{% if cur_dc_max == 0 %} {% set cur_dc_max=-1 %} {% endif %}
 
 {% block content %}
 	<form method="GET" class="form-inline well">
@@ -127,43 +131,13 @@
 		</div>
 		<div>
 			Цена, от:<br>
-			<select class="custom-select" id='price_min' onchange="SelectChangeValue('price_min', 'price_min')">
-				{% set price_min = [
-												{'id': '-1', 'name': 'без ограничений'},
-												{'id': '2000000', 'name': '2 млн.р.'},
-												{'id': '5000000', 'name': '5 млн.р.'},
-												{'id': '10000000', 'name': '10 млн.р.'},
-												{'id': '20000000', 'name': '20 млн.р.'},
-												{'id': '50000000', 'name': '50 млн.р.'},
-												{'id': '100000000', 'name': '100 млн.р.'},
-												{'id': '200000000', 'name': '200 млн.р.'},
-												]  %}
-				{% for price_min in price_min %}
-				<option value={{ price_min.id }} {% if price_min.id == cur_price_min %} selected {% endif %}>
-					{{ price_min.name }}
-				</option>
-				{% endfor %}
-			</select>
+			<input type="text" id='price_min' value='{{ cur_price_min }}'> 
+			<button type="button" onclick="inputSelectChangeValue('price_min', 'price_min')">применить</button>
 		</div>
 		<div>
 			Цена, до:<br>
-			<select class="custom-select" id='price_max' onchange="SelectChangeValue('price_max', 'price_max')">
-				{% set price_max = [
-												{'id': '-1', 'name': 'без ограничений'},
-												{'id': '2000000', 'name': '2 млн.р.'},
-												{'id': '5000000', 'name': '5 млн.р.'},
-												{'id': '10000000', 'name': '10 млн.р.'},
-												{'id': '20000000', 'name': '20 млн.р.'},
-												{'id': '50000000', 'name': '50 млн.р.'},
-												{'id': '100000000', 'name': '100 млн.р.'},
-												{'id': '200000000', 'name': '200 млн.р.'},
-												]  %}
-				{% for price_max in price_max %}
-				<option value={{ price_max.id }} {% if price_max.id == cur_price_max %} selected {% endif %}>
-					{{ price_max.name }}
-				</option>
-				{% endfor %}
-			</select>
+			<input type="text" id='price_max' value='{{ cur_price_max }}'>
+			<button type="button" onclick="inputSelectChangeValue('price_max', 'price_max')">применить</button>
 		</div>
 		<div>
 			Общая площадь, от:<br>
@@ -334,6 +308,30 @@
 
 			</select>
 		</div>
+		<div>
+			Срок сдачи, от:<br>
+			<select class="custom-select" id='dc_min' onchange="SelectChangeValue('dc_min', 'dc_min')">
+				<option value="-1">без ограничений</option>
+				{% for date_complete in date_complete %}
+				<option value={{ date_complete.id }} {% if date_complete.id == cur_dc_min %} selected {% endif %}>
+					{{ date_complete.name }}
+				</option>
+				{% endfor %}
+
+			</select>
+		</div>
+		<div>
+			Срок сдачи, до:<br>
+			<select class="custom-select" id='dc_max' onchange="SelectChangeValue('dc_max', 'dc_max')">
+				<option value="-1">без ограничений</option>
+				{% for date_complete in date_complete %}
+				<option value={{ date_complete.id }} {% if date_complete.id == cur_dc_max %} selected {% endif %}>
+					{{ date_complete.name }}
+				</option>
+				{% endfor %}
+
+			</select>
+		</div>
 	</form>
 {% endblock %}
 
@@ -357,7 +355,9 @@
 							zone=cur_zone,
 							rcity=cur_region_city,
 							dd=cur_district_direction,
-							atd=cur_atd
+							atd=cur_atd,
+							dc_min=cur_dc_min,
+							dc_max=cur_dc_max
 							)}}" alt="Image Placeholder" height="400">
 {% endblock %}
 
@@ -382,7 +382,7 @@
 			{% for object in object %}
 			<tr>
 				<td>{{ object.id}}</td>
-				<td>{{ object.developer_id}}:{{ object.dev_name}} <a href="{{ url_for('developer', developer_id = object.developer_id) }}"> к застройщику</a>
+				<td>{{ object.dev_name}} <a href="{{ url_for('developer', developer_id = object.developer_id) }}"> к застройщику</a>
 					<br>
 					{{ object.hc_name}} <a href="{{ url_for('housing_complex', housing_complex_id = object.housing_complex_id) }}"> к
 						ЖК</a>
@@ -393,8 +393,8 @@
 				</td>
 				<td>{{ object.room}}</td>
 				<td>{{ object.square}}</td>
-				<td>{{ object.price}}</td>
-				<td>{{ object.price_meter}}</td>
+				<td>{{ object.price }}</td>
+				<td>{{ object.price_meter }}</td>
 				<td>{{ object.floor}}</td>
 				<td>{{ object.type}}</td>
 				<td>{{ object.decoration}}</td>

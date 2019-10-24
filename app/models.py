@@ -62,6 +62,7 @@ class House(db.Model):
     decoration = db.Column(db.String(64))
     agreement = db.Column(db.String(8))
     date_complete = db.Column(db.String(16))
+    date_complete_id = db.Column(db.Integer)
     stage = db.Column(db.String(16))
     dt = db.Column(db.DateTime, default=datetime.utcnow)
 
@@ -117,4 +118,13 @@ class Atd(db.Model):
 
     def __repr__(self):
         return '<Atd {}>'.format(self.body)
+
+
+class DateComplete(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(64))
+    dt = db.Column(db.DateTime, default=datetime.utcnow)
+
+    def __repr__(self):
+        return '<DateComplete {}>'.format(self.body)
 

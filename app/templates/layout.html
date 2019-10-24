@@ -12,8 +12,11 @@
 		<link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
 	</head>
 	<body>
-		<div>
+		<div class="container">
 			<nav class='nav nav-tabs'>
+				<a 
+				{%  if request.path ==  url_for('quick_action') %}	class="nav-link active"	{% else %} class="nav-link"	{% endif %}
+				 href="{{ url_for('quick_action') }}">Быстрые действия</a>
 				<a 
 				{%  if request.path ==  url_for('developer') %}	class="nav-link active"	{% else %} class="nav-link"	{% endif %}
 				 href="{{ url_for('developer') }}">Застройщик</a>
@@ -44,7 +47,9 @@
 				zone=-1,
 				rcity=-1,
 				atd=-1,
-				dd=-1
+				dd=-1,
+				dc_min=-1,
+				dc_max=-1
 				)}}">Аналитика</a>
 			</nav>
 		</div>

@@ -92,9 +92,18 @@ function houseSelectChangeValue() {
 
 function SelectChangeValue(element_id, url_name) {
 	var url = window.location.href
-	// is studio
+
 	var selObj = document.getElementById(element_id);
 	var selValue = selObj.options[selObj.selectedIndex].value;
+	url = updateURLParameter(url, url_name, selValue);
+	// Redirect
+	window.location.replace(url);
+}
+function inputSelectChangeValue(element_id, url_name) {
+	var url = window.location.href
+
+	var selObj = document.getElementById(element_id);
+	var selValue = selObj.value;
 	url = updateURLParameter(url, url_name, selValue);
 	// Redirect
 	window.location.replace(url);

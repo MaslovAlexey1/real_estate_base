@@ -9,7 +9,7 @@
 	<thead class="thead-dark">
 		<tr>
 			<th scope="col">название застройщика</th>
-			<th scope="col">средняя цена кв/ап</th>
+			<th scope="col">цена кв/ап</th>
 			<th scope="col">количество кв/ап</th>
 			<th scope="col">количество ЖК</th>
 		</tr>
@@ -20,11 +20,11 @@
 			<td>{{ developer.id}}: {{ developer.name}} 
 				<a href="{{ url_for('developer', developer_id=developer.id) }}"><span class="badge badge-info">список ЖК</span></a>
 				<a href="{{ url_for('real_estate_base', dev=developer.id) }}"><img src="/static/fonts/icons8-web-analytics-24.png"></img></a>
-				
-
 			</td>
 			<td>
-				{{ "RUB {:,.0f}".format(developer.price) }}
+				от: {{ "RUB {:,.0f}".format(developer.min_price) }} <br>
+				ср: {{ "RUB {:,.0f}".format(developer.avg_price) }} <br>
+				до: {{ "RUB {:,.0f}".format(developer.max_price) }}
 			</td>
 			<td>
 				{{ developer.count_object }}

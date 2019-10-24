@@ -4,7 +4,7 @@ from matplotlib.ticker import FuncFormatter
 from flask import Flask, escape, request, render_template, flash, redirect, url_for, send_file
 from app import app
 from app.forms import LoginForm
-from app.models import Developer, HousingComplex, House, Object, RegionCity, DistrictDirection, Atd
+from app.models import Developer, HousingComplex, House, Object, RegionCity, DistrictDirection, Atd, DateComplete
 import numpy as np
 import pandas as pd 
 import matplotlib.pyplot as plt
@@ -16,8 +16,11 @@ sns.set()
 @app.route('/')
 @app.route('/index')
 def index():
-	return redirect('/developer/', code=302)
+	return redirect('/quick_action/', code=302)
 
+@app.route('/quick_action/')
+def quick_action():
+	return render_template('quick_action.html')
 
 @app.route('/geo/')
 def geo():
@@ -35,10 +38,13 @@ def geo():
 @app.route('/developer/<developer_id>')
 def developer(developer_id=-1):
 	if developer_id == -1 :
-		sql_query = 'select d.id, d.name, avg(o.price) price, count(o.id) count_object, count(distinct o.housing_complex_id) count_housing_complex \
+		sql_query = 'select d.id, d.name, avg(o.price) avg_price, min(o.price) min_price, max(o.price) max_price, \
+					count(o.id) count_object, \
+					count(distinct o.housing_complex_id) count_housing_complex \
 					from developer d \
 					join object o on d.id = o.developer_id \
 					where o.type in (\'Квартира\', \'Апартамент\', \'Кв/ап\') \
+					and o.price <> "" \
 					group by d.id '
 		conn = 'sqlite:///app.db'
 		Session = sessionmaker()
@@ -52,7 +58,8 @@ def developer(developer_id=-1):
 
 	developer = Developer.query.get(developer_id)
 
-	sql_query = 'select hc.*, avg(o.price) price, count(o.id) count_object, count(distinct o.housing_complex_id) count_housing_complex \
+	sql_query = 'select hc.*, avg(o.price) avg_price, min(o.price) min_price, max(o.price) max_price, \
+					count(o.id) count_object, count(distinct o.housing_complex_id) count_housing_complex \
 					from housing_complex hc \
 					join object o on hc.id = o.housing_complex_id \
 					where hc.developer_id = ' + developer_id + ' \
@@ -154,6 +161,7 @@ def real_estate_base():
 	region_city = RegionCity.query.all()
 	district_direction = DistrictDirection.query.all()
 	atd = Atd.query.all()
+	date_complete = DateComplete.query.all()
 
 	developer_id = request.args.get('dev')
 	developer_id = int(developer_id) if developer_id is not None else 0
@@ -215,6 +223,11 @@ def real_estate_base():
 	atd_id = request.args.get('atd')
 	atd_id = int(atd_id) if atd_id is not None else -1
 
+	dc_min = request.args.get('dc_min')
+	dc_min = int(dc_min) if dc_min is not None else -1
+	dc_max = request.args.get('dc_max')
+	dc_max = int(dc_max) if dc_max is not None else -1
+
 	sql_select = 'select o.id, o.developer_id, o.room, o.square, o.price, \
 	o.price_meter, o.floor, o.floor_number, o.house_number, o.section_number, \
 	o.type_studio, o.type, o.decoration, o.price_discont, o.housing_complex_id, o.house_id, h.name house_name, \
@@ -241,6 +254,8 @@ def real_estate_base():
 	sql_region_city = ' and hc.region_city_id = ' + str(region_city_id) if region_city_id != -1 else ''
 	sql_district_direction = ' and hc.district_direction_id = ' + str(district_direction_id) if district_direction_id != -1 else ''
 	sql_atd = ' and hc.atd_id = ' + str(atd_id) if atd_id != -1 else ''
+	sql_dc_min = ' and h.date_complete_id >= ' + str(dc_min) if dc_min != -1 else ''
+	sql_dc_max = ' and h.date_complete_id <= ' + str(dc_max) if dc_max != -1 else ''
 	sql_limit = ' limit 500 '
 	sql_order = ' '
 
@@ -263,7 +278,9 @@ def real_estate_base():
 
 	sql_query = sql_select + sql_join_house + sql_join_housing_complex + sql_join_dev + sql_where_1_1 + sql_object_type + sql_room + sql_decoration + \
 	            sql_price_min + sql_price_max + sql_square_min + sql_square_max + sql_is_studio + sql_dev_hc_h + \
-				sql_hclass + sql_agreement + sql_stage + sql_zone + sql_region_city + sql_district_direction + sql_atd + sql_order + sql_limit
+				sql_hclass + sql_agreement + sql_stage + sql_zone + sql_region_city + sql_district_direction + sql_atd + \
+            sql_dc_min + sql_dc_max +\
+				sql_order + sql_limit
 
 	Session = sessionmaker()
 	engine = create_engine(conn)
@@ -279,7 +296,8 @@ def real_estate_base():
 		object = object,
 		region_city = region_city,
 		district_direction=district_direction,
-		atd = atd
+		atd = atd,
+		date_complete = date_complete
 		)
 
 
@@ -344,6 +362,11 @@ def square_price_scatter():
 	atd_id = request.args.get('atd')
 	atd_id = int(atd_id) if atd_id is not None else -1
 
+	dc_min = request.args.get('dc_min')
+	dc_min = int(dc_min) if dc_min is not None else -1
+	dc_max = request.args.get('dc_max')
+	dc_max = int(dc_max) if dc_max is not None else -1
+
 	fig, ax = plt.subplots(figsize=(10, 6))
 	sql_select = 'select o.room, o.square, o.price, o.type from object o '
 	sql_join_house = ' join house h on o.house_id = h.id '
@@ -365,6 +388,8 @@ def square_price_scatter():
 	sql_region_city = ' and hc.region_city_id = ' + str(region_city_id) if region_city_id != -1 else ''
 	sql_district_direction = ' and hc.district_direction_id = ' + str(district_direction_id) if district_direction_id != -1 else ''
 	sql_atd = ' and hc.atd_id = ' + str(atd_id) if atd_id != -1 else ''
+	sql_dc_min = ' and h.date_complete_id >= ' + str(dc_min) if dc_min != -1 else ''
+	sql_dc_max = ' and h.date_complete_id <= ' + str(dc_max) if dc_max != -1 else ''
 	sql_order = ' '
 	sql_limit = ' '
 
@@ -380,8 +405,10 @@ def square_price_scatter():
 
 	conn = 'sqlite:///app.db'
 	df = pd.read_sql(sql_select + sql_join_house + sql_join_housing_complex + sql_where_1_1 + sql_object_type + sql_decoration + sql_room +
-	                 sql_price_min + sql_price_max + sql_square_min + sql_square_max + sql_is_studio + sql_dev_hc_h + 
-					 sql_hclass + sql_agreement + sql_stage + sql_zone + sql_region_city + sql_district_direction + sql_atd + sql_order + sql_limit, conn)
+	                sql_price_min + sql_price_max + sql_square_min + sql_square_max + sql_is_studio + sql_dev_hc_h + 
+					sql_hclass + sql_agreement + sql_stage + sql_zone + sql_region_city + sql_district_direction + sql_atd +\
+					sql_dc_min + sql_dc_max +\
+					sql_order + sql_limit, conn)
 	
 	df['price'] = pd.to_numeric(df['price'])
 	df['square'] = pd.to_numeric(df['square'])
